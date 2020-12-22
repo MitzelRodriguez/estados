@@ -1,22 +1,18 @@
-import 'package:flutter/material.dart';
-
 import 'package:estados/models/usuario.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:estados/services/usuario_services.dart';
 
 class Pagina2Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final usuarioService = Provider.of<UsuarioService>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
-        title: StreamBuilder(
-          stream: usuarioService.usuarioStream,
-          builder: (BuildContext context, AsyncSnapshot<Usuario> snapshot) {
-            return snapshot.hasData
-                ? Text('Nombre: ${snapshot.data.nombre}')
-                : Text('Pagina2');
-          },
-        ),
-      ),
+          title: usuarioService.existeUsuario
+              ? Text('Usuario: ${usuarioService.usuario.nombre}')
+              : Text('Usuario null')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -28,9 +24,8 @@ class Pagina2Page extends StatelessWidget {
                 ),
                 color: Colors.blue,
                 onPressed: () {
-                  final nuevoUsuario = new Usuario(nombre: 'TestUno', edad: 35);
-
-                  usuarioService.cargarUsuario(nuevoUsuario);
+                  final newUser = new Usuario(nombre: 'Test1 ', edad: 34, profesiones: ['FullStack Developer', 'FrontEnd', 'Playing Gamer']);
+                  usuarioService.usuario = newUser;
                 }),
             MaterialButton(
                 child: Text(
@@ -39,7 +34,7 @@ class Pagina2Page extends StatelessWidget {
                 ),
                 color: Colors.blue,
                 onPressed: () {
-                  usuarioService.cambiarEdad(30);
+                  usuarioService.cambiarEdad(25);
                 }),
             MaterialButton(
                 child: Text(
@@ -47,7 +42,9 @@ class Pagina2Page extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 color: Colors.blue,
-                onPressed: () {}),
+                onPressed: () {
+                  usuarioService.agregarProfesion();
+                }),
           ],
         ),
       ),

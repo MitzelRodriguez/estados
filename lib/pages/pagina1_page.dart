@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:estados/models/usuario.dart';
 import 'package:estados/services/usuario_services.dart';
@@ -6,20 +7,22 @@ import 'package:estados/services/usuario_services.dart';
 class Pagina1Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final usuarioService = Provider.of<UsuarioService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Pagina 1'),
+        actions: [
+          IconButton(icon: Icon(Icons.exit_to_app), onPressed: (){
+            usuarioService.removerUsuario();
+          })
+        ],
       ),
-      body: StreamBuilder(
-        stream: usuarioService.usuarioStream,
-        builder: (BuildContext context, AsyncSnapshot<Usuario> snapshot) {
-          return snapshot.hasData
-              ? InformacionUsuario(snapshot.data)
-              : Center(
-                  child: Text('No hay informacion del usuario'),
-                );
-        },
-      ),
+      
+      body: usuarioService.existeUsuario
+          ? InformacionUsuario(usuarioService.usuario)
+          : Center(
+              child: Text('No hay informacion del usuario'),
+            ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.navigate_next_outlined),
           onPressed: () => Navigator.pushNamed(context, 'pagina2')),
@@ -29,6 +32,7 @@ class Pagina1Page extends StatelessWidget {
 
 // ignore: camel_case_types
 class InformacionUsuario extends StatelessWidget {
+
   final Usuario usuario;
 
   const InformacionUsuario(this.usuario);
@@ -47,16 +51,16 @@ class InformacionUsuario extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Divider(),
-          ListTile(title: Text('Nombre: ${usuario.nombre}')),
-          ListTile(title: Text('Edad: ${usuario.edad}')),
+          ListTile(title: Text('Nombre: ${this.usuario.nombre}')),
+          ListTile(title: Text('Edad: ${this.usuario.edad}')),
           Text(
             'Profesiones',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Divider(),
-          ListTile(title: Text('Profesion 1: ')),
-          ListTile(title: Text('Profesion 2: ')),
-          ListTile(title: Text('Profesion 3: ')),
+          // ListTile(title: Text('Profesion 1: ')),
+        //... <= Desestructuracion envia manda cada uno de los elementos de la lista de manera individual
+         ...usuario.profesiones.map((profesion) => ListTile(title: Text(profesion ),)).toList(),
         ],
       ),
     );
